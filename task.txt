@@ -1,0 +1,8 @@
+1. set 'date' searched  in product object  / DONE
+2. make a excel also compare price / DONE 
+   and send email. / DONE
+3. validate if page is founded 200 || 404 / DONE
+4. upload project in GITHUB  / DONE
+5. how to execute script of period of days? 
+6. CORREGIR REGISTRO DE FECHA
+
