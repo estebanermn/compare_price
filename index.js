@@ -1,8 +1,8 @@
 const { chromium } = require("playwright");
 const { objList, WEB_NAMES } = require("./src/constants.js");
 const { updateExcelFile } = require("./src/generateExcelFile.js");
-const moment = require("moment-timezone");
 const { isNullOrEmpty, replaceSymbols } = require("./src/helpers.js");
+const moment = require("moment-timezone");
 
 String.empty = "";
 
