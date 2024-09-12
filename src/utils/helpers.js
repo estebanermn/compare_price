@@ -59,16 +59,16 @@ async function registerProductScraping(id, name, price, url) {
   // if(price < item.price)
   //send(email)
 
-  // const productScrapingPrice = await models.ProductScrapingPrice.create(
-  //   {
-  //     name: name,
-  //     url: url,
-  //     price: price,
-  //     date: moment().tz("America/Lima").format("YYYY-MM-DD HH:mm:ss"),
-  //     ProductId: id,
-  //   },
-  //   { include: models.Product }
-  // );
+  const productScrapingPrice = await models.ProductScrapingPrice.create(
+    {
+      name: name,
+      url: url,
+      price: price,
+      date: moment().tz("America/Lima").format("YYYY-MM-DD HH:mm:ss"),
+      ProductId: id,
+    },
+    { include: models.Product }
+  );
 }
 
 function getDomainName(url) {
