@@ -4,7 +4,6 @@ const { sendMail } = require("./sendMail.js");
 const {
   isNullOrEmpty,
   lowerPrice,
-  higherPrice,
   parseStringToNumber,
 } = require("./helpers.js");
 
@@ -92,12 +91,6 @@ const createMailMessage = function (priceLastRegister, item, list) {
       url: item.url,
     });
   }
-  // else if (price > lastPrice) {
-  //   console.log(higherPrice(item.price, priceLastRegister));
-  // }
-  //  else {
-  //   console.log(`El precio ${price} es igual a ${lastPrice}.`);
-  // }
 
   return list;
 };

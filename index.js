@@ -1,108 +1,45 @@
 const { chromium } = require("playwright");
-const { objList, WEB_NAMES } = require("./src/constants.js");
-const { updateExcelFile } = require("./src/generateExcelFile.js");
-const { isNullOrEmpty, replaceSymbols } = require("./src/helpers.js");
-const moment = require("moment-timezone");
+const { WEB_DOMAIN_NAME } = require("./src/utils/constants.js");
+const helper = require("./src/utils/helpers.js");
+const { updateExcelFile } = require("./src/utils/generateExcelFile.js");
 
-String.empty = "";
+const { getDataFromAudioMusica } = require("./src/functions/audioMusica.js");
+const { getDataFromMusicMarket } = require("./src/functions/musicMarket.js");
 
-(async () => {
-  const browser = await chromium.launch({
-    headless: false,
-  });
+const sequelize = require("./src/config/database");
+const models = require("./src/models/association.js");
 
-  const context = await browser.newContext();
-  const page = await context.newPage();
+async function main() {
+  try {
+    const products = await models.Product.findAll();
+    const listProducts = products.map((p) => p.dataValues);
 
-  var listProduct = [];
+    const browser = await chromium.launch({
+      headless: false,
+    });
 
-  for (let item of objList) {
-    let result = String.empty;
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
-    if (item.name === WEB_NAMES.MUSIC_MARKET) {
-      result = await getDataFromMusicMarket(page, item);
-    } else if (item.name === WEB_NAMES.AUDIO_MUSICA) {
-      result = await getDataFromAudioMusica(page, item);
+    for (let item of listProducts) {
+      if (helper.getDomainName(item.url) === WEB_DOMAIN_NAME.MUSIC_MARKET) {
+        await getDataFromMusicMarket(page, item);
+      } else if (
+        helper.getDomainName(item.url) === WEB_DOMAIN_NAME.AUDIO_MUSICA_COM_PE
+      ) {
+        await getDataFromAudioMusica(page, item);
+      }
     }
 
-    if (result) listProduct.push(result);
+    await context.close();
+    await browser.close();
+
+    //await updateExcelFile(listProduct);
+  } catch (error) {
+    console.error("Error al interactuar con la base de datos:", error);
+  } finally {
+    await sequelize.close();
   }
-
-  await context.close();
-  await browser.close();
-
-  await updateExcelFile(listProduct);
-  // console.log("product", listProduct);
-})();
-
-//Methods
-async function getDataFromMusicMarket(page, item) {
-  const response = await page.goto(item.url, { waitUntil: "load" });
-  if (!response.ok())
-    return setProduct(
-      item.id,
-      `Could not enter ${item.name} | ${item.url}`,
-      String.empty,
-      String.empty
-    );
-
-  const name = await page.evaluate(() => {
-    const getName = document.querySelector("div.product-main h1");
-    return getName ? getName.innerHTML.trim() : String.empty;
-  });
-
-  const price = await page.evaluate(() => {
-    const getPrice = document.querySelector("div.price--main span");
-    return getPrice ? getPrice.textContent.trim() : String.empty;
-  });
-
-  return validateSelectors(item.id, name, price, item.url);
 }
 
-async function getDataFromAudioMusica(page, item) {
-  const response = await page.goto(item.url, { waitUntil: "load" });
-  if (!response.ok())
-    return setProduct(
-      item.id,
-      `Could not enter ${item.name} | ${item.url}`,
-      String.empty,
-      String.empty
-    );
-
-  const name = await page.evaluate(() => {
-    const getName = document.querySelector(
-      "h1.vtex-store-components-3-x-productNameContainer span"
-    );
-    return getName ? getName.textContent.trim() : String.empty;
-  });
-
-  const price = await page.evaluate(() => {
-    const items = document.querySelectorAll(
-      "span.vtex-product-price-1-x-sellingPriceValue span.vtex-product-price-1-x-currencyContainer span"
-    );
-    const list = [];
-    if (items === null) return String.empty;
-
-    items.forEach((item) => list.push(item.textContent));
-    return list.join("");
-  });
-
-  return validateSelectors(item.id, name, price, item.url);
-}
-
-function setProduct(id, name, price, url) {
-  var product = {
-    id: id,
-    name: name,
-    price: replaceSymbols(price),
-    url: url,
-    createDate: moment().tz("America/Lima").format("YYYY-MM-DD HH:mm:ss"),
-  };
-  return product;
-}
-
-function validateSelectors(id, name, price, url) {
-  return isNullOrEmpty(price)
-    ? setProduct(id, `Product not found`, String.empty, url)
-    : setProduct(id, name, price, url);
-}
+main();

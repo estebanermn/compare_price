@@ -15,8 +15,6 @@ const sendMail = async function (result) {
   if (error) {
     return console.error({ error });
   }
-
-  console.log({ data });
 };
 
 function generateProductHTML(productList) {
