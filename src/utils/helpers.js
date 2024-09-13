@@ -1,5 +1,6 @@
 const moment = require("moment-timezone");
 const models = require("../models/association");
+const { sendMail } = require("./sendMail");
 
 function isNullOrEmpty(str) {
   return !str || str.trim().length === 0;
@@ -56,10 +57,19 @@ async function registerProductScraping(id, name, price, url) {
     order: [["date", "DESC"]],
   });
 
-  // if(price < item.price)
-  //send(email)
+  if (price < item.price) {
+    const product = {
+      id: id,
+      name: name,
+      url: url,
+      price: price,
+      message: lowerPrice(price, item.price),
+    };
 
-  const productScrapingPrice = await models.ProductScrapingPrice.create(
+    await sendMail(product);
+  }
+
+  await models.ProductScrapingPrice.create(
     {
       name: name,
       url: url,

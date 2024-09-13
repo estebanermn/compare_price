@@ -11,7 +11,9 @@ const models = require("./src/models/association.js");
 
 async function main() {
   try {
-    const products = await models.Product.findAll();
+    const products = await models.Product.findAll({
+      where: { isActive: true },
+    });
     const listProducts = products.map((p) => p.dataValues);
 
     const browser = await chromium.launch({
