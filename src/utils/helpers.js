@@ -57,16 +57,18 @@ async function registerProductScraping(id, name, price, url) {
     order: [["date", "DESC"]],
   });
 
-  if (price < item.price) {
-    const product = {
-      id: id,
-      name: name,
-      url: url,
-      price: price,
-      message: lowerPrice(price, item.price),
-    };
+  if (item != null) {
+    if (price < item.price) {
+      const product = {
+        id: id,
+        name: name,
+        url: url,
+        price: price,
+        message: lowerPrice(price, item.price),
+      };
 
-    await sendMail(product);
+      await sendMail(product);
+    }
   }
 
   await models.ProductScrapingPrice.create(
