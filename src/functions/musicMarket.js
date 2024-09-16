@@ -8,7 +8,7 @@ async function getDataFromMusicMarket(page, item) {
       item.id,
       `Could not enter ${item.name} | ${url}`,
       String.empty,
-      String.empty
+      url
     );
 
   const name = await page.evaluate(() => {
@@ -20,7 +20,7 @@ async function getDataFromMusicMarket(page, item) {
     const getPrice = document.querySelector("div.price--main span.money");
     return getPrice ? getPrice.textContent.trim() : String.empty;
   });
-
+  console.log("::", `${name} - ${price}`);
   return await validateSelectors(item.id, name, price, url);
 }
 

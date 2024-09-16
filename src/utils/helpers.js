@@ -21,16 +21,22 @@ const lowerPrice = (price, priceLastRegister) =>
    S/${priceLastRegister - price} bajo el producto.`;
 
 async function validateSelectors(id, name, price, url) {
-  const priceValue = parseStringToNumber(replaceSymbols(price));
-
   if (isNullOrEmpty(price))
-    await registerProductError(id, `Product not found | ${name}`, url);
-  else if (isNaN(priceValue))
-    await registerProductError(id, `Price is not a valid number ${name}`, url);
+    return await registerProductError(id, `Product not found | ${name}`, url);
+
+  const priceSymbols = replaceSymbols(price);
+  const priceValue = parseStringToNumber(priceSymbols);
+
+  if (isNaN(priceValue))
+    return await registerProductError(
+      id,
+      `Price is not a valid number ${name}`,
+      url
+    );
   else if (priceValue >= 0)
-    await registerProductScraping(id, name, priceValue, url);
+    return await registerProductScraping(id, name, priceValue, url);
   else
-    await registerProductError(
+    return await registerProductError(
       id,
       `Product not found, maybe the selector changed | ${name}`,
       url
@@ -57,19 +63,21 @@ async function registerProductScraping(id, name, price, url) {
     order: [["date", "DESC"]],
   });
 
-  if (price < item.price) {
-    const product = {
-      id: id,
-      name: name,
-      url: url,
-      price: price,
-      message: lowerPrice(price, item.price),
-    };
+  if (item != null) {
+    if (price < item.price) {
+      const product = {
+        id: id,
+        name: name,
+        url: url,
+        price: price,
+        message: lowerPrice(price, item.price),
+      };
 
-    await sendMail(product);
+      await sendMail(product);
+    }
   }
 
-  await models.ProductScrapingPrice.create(
+  const s = await models.ProductScrapingPrice.create(
     {
       name: name,
       url: url,

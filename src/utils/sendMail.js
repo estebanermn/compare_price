@@ -7,7 +7,7 @@ const sendMail = async function (result) {
   const productHtml = generateProductHTML(result);
   const { data, error } = await resend.emails.send({
     from: "Compare price <onboarding@resend.dev>",
-    to: ["estebanermn@gmail.com"],
+    to: [process.env.RECIPIENT_MAIL],
     subject: "Nuevos precios",
     html: `<strong> ${productHtml}</strong>`,
   });

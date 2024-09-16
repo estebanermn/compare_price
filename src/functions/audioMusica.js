@@ -8,7 +8,7 @@ async function getDataFromAudioMusica(page, item) {
       item.id,
       `Could not enter ${item.name} | ${url}`,
       String.empty,
-      String.empty
+      url
     );
 
   const name = await page.evaluate(() => {
