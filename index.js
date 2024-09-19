@@ -1,8 +1,5 @@
 const sequelize = require("./src/config/database");
 const { init } = require("./src/initScraping");
-const moment = require("moment-timezone");
-// require("dotenv").config();
-// const { sendMail } = require("./src/utils/sendMail");
 
 async function main() {
   try {

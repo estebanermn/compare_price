@@ -1,12 +1,7 @@
 require("colors");
 const models = require("./src/models/association");
 
-const {
-  inquirerMenu,
-  pausa,
-  leerInput,
-  confirmar,
-} = require("./src/utils/inquirer");
+const { inquirerMenu, pausa, leerInput } = require("./src/utils/inquirer");
 
 const main = async () => {
   let opt = "";
@@ -23,7 +18,6 @@ const main = async () => {
           name: inputProduct,
           url: inputUrl,
         });
-        console.log(`Se ingreso: ${inputProduct} ${inputUrl} `);
         console.log(`Se registro el producto: ${product.dataValues} `);
         break;
 
